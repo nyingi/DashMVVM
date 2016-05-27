@@ -1,8 +1,12 @@
-# You've added your first ReadMe file!
-A README.md file is intended to quickly orient readers to what your project can do.  New to Markdown? [Learn more](http://go.microsoft.com/fwlink/p/?LinkId=524306&clcid=0x409)
+# FeatherMvvm
+Inspired by MvvmCross for Xamarin.Android and Xamarin.iOS, this is a basic Mvvm library for WinForms that seeks to channel the ease, structure and 
+clarity that simple, robust and predictable databinding brings to apps.
 
-## Edit this ReadMe and commit your change to a topic branch
-In Git, branches are cheap.  You should use them whenever you're making changes to your repository.  Edit this file by clicking on the edit icon.
+## Components
+### 1.Views
+FeatherMvvm has a base class for views. This base class inherits System.Windows.Forms.Form thus when you base your views on this, not only do 
+you gain extended binding functionality, you also maintain the drag-n-drop form building capabilities in Visual Studio.
+
 
 Then make some changes to this ReadMe file.
 
