@@ -13,7 +13,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace Jattac.Libs.WinFormsBinding
+namespace FeatherMvvm
 {
 	/// <summary>
 	/// Description of MyClass.
@@ -45,6 +45,15 @@ namespace Jattac.Libs.WinFormsBinding
 			field = value;
 			OnPropertyChanged(propertyName);
 			return true;
+		}
+		
+		
+		public virtual void Apply()
+		{
+			foreach(PropertyInfo prop in GetType().GetProperties())
+			{
+				OnPropertyChanged(prop.Name);
+			}
 		}
 		
 		protected PropertyInfo GetPropertyInfo<TSource, TProperty>(

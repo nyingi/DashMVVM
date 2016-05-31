@@ -8,10 +8,12 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Windows.Forms;
 
-namespace Jattac.Libs.WinFormsBinding
+namespace FeatherMvvm
 {
 	/// <summary>
 	/// Description of BindingContext.
@@ -29,8 +31,12 @@ namespace Jattac.Libs.WinFormsBinding
 			
 		}
 		
+		public void Apply()
+		{
+			_viewModel.Apply();
+		}
 		
-		public TViewObject Bind<TViewObject,TViewProperty,TViewModelProperty>(TViewObject viewObj,Expression<Func<TViewObject,TViewProperty>> viewProperty,Expression<Func<TViewModel,TViewModelProperty>> viewModelProperty)
+		public BindingInformation<TViewObject> Bind<TViewObject,TViewProperty,TViewModelProperty>(TViewObject viewObj,Expression<Func<TViewObject,TViewProperty>> viewProperty,Expression<Func<TViewModel,TViewModelProperty>> viewModelProperty)
 		{
 			PropertyInfo vmProp = GetPropertyInfo(_viewModel, viewModelProperty);
 			PropertyInfo viewProp = GetPropertyInfo(viewObj, viewProperty);
@@ -44,10 +50,89 @@ namespace Jattac.Libs.WinFormsBinding
 			{
 				if(e.PropertyName == vmProp.Name)
 				{
-					viewProp.SetValue(viewObj,vmProp.GetValue(_viewModel));
+					SetValue(_viewModel, viewObj, vmProp, viewProp);
 				}
 			};
-			return viewObj;
+			AutoBindView(viewObj);
+			return new BindingInformation<TViewObject>(viewObj);
+		}
+		
+		private void AutoBindView(object obj)
+		{
+			if(obj.GetType() == typeof(TextBox))
+			{
+				TextBox txt = obj as TextBox;
+				txt.TextChanged += (sender, e) => ViewChanged(txt,vw => vw.Text);
+			}
+		}
+		
+		
+		private TReturn GetEnumValue<TReturn>(string value)
+		{
+			int enumVal;
+			if (!int.TryParse(value, out enumVal))
+			{
+				var enumVals = Enum.GetValues(typeof(TReturn)).OfType<object>().ToList();
+				for (int i = 0; i < enumVals.Count; i++)
+				{
+					if (Enum.GetName(typeof(TReturn), enumVals[i]) == value)
+					{
+						return (TReturn)enumVals[i];
+					}
+				}
+			}
+			try
+			{
+				return (TReturn)Enum.GetValues(typeof(TReturn)).OfType<object>()
+						.FirstOrDefault(v => ((int)v) == enumVal);
+			}
+			catch
+			{
+				return default(TReturn);
+			}
+		}
+		
+		public TReturn GetTyped<TReturn>(string value) where TReturn : IConvertible
+		{
+			if(string.IsNullOrEmpty(value))
+			{
+				return default(TReturn);
+			}
+			if(typeof(TReturn).IsEnum)
+			{
+				return GetEnumValue<TReturn>(value);
+			}
+			return (TReturn)Convert.ChangeType(value, typeof(TReturn));
+		}
+		
+		private void SetValue(object sourceObj, object destinationObj, PropertyInfo source, PropertyInfo destination)
+		{
+			Control viewControl = (Control)_view;
+			if(viewControl.InvokeRequired)
+			{
+				viewControl.Invoke
+					(
+						(MethodInvoker)
+						delegate
+						{
+							SetValue(sourceObj,destinationObj,source,destination);
+						}
+				);
+				return;
+			}
+			object intermediaryValue = source.GetValue(sourceObj);
+			string value = intermediaryValue == null ? "" : intermediaryValue.ToString();
+			if(destination.PropertyType.GetInterfaces().Contains(typeof(IConvertible)))
+			{
+				Type thisType = this.GetType();
+				MethodInfo theMethod = thisType.GetMethod("GetTyped");
+				var genericMethod = theMethod.MakeGenericMethod(destination.PropertyType);
+				destination.SetValue(destinationObj, genericMethod.Invoke(this, new[]{ value}));
+			}
+			else
+			{
+				destination.SetValue(destinationObj, value);
+			}
 		}
 		
 		public FeatherBinder<TViewModel> ViewChanged<TViewObject,TViewProperty>(TViewObject viewObj,Expression<Func<TViewObject,TViewProperty>> viewProperty)
@@ -63,7 +148,7 @@ namespace Jattac.Libs.WinFormsBinding
 			
 			foreach (PropertyInfo propInfo in props)
 			{
-				propInfo.SetValue(_viewModel, value);
+				SetValue(viewObj, _viewModel, viewProp, propInfo);
 			}
 			return this;
 		}

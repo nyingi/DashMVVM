@@ -6,8 +6,8 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>Library</OutputType>
-    <RootNamespace>Jattac.Libs.FeatherMvvm</RootNamespace>
-    <AssemblyName>Jattac.Libs.FeatherMvvm</AssemblyName>
+    <RootNamespace>FeatherMvvm</RootNamespace>
+    <AssemblyName>FeatherMvvm</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <TargetFrameworkProfile />
@@ -47,6 +47,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BindingInformation.cs" />
     <Compile Include="FeatherBinder.cs" />
     <Compile Include="FeatherView.cs" />
     <Compile Include="FeatherViewModel.cs" />

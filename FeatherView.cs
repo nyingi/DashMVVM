@@ -13,7 +13,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace Jattac.Libs.WinFormsBinding
+namespace FeatherMvvm
 {
 	/// <summary>
 	/// Description of IView.
