@@ -1,3 +1,6 @@
 Jattac.Libs.FeatherMvvm.csproj.FileListAbsolute.txt
 Jattac.Libs.WinFormsBinding.csproj.FileListAbsolute.txt
 Debug
+modules.xml
+workspace.xml
+FeatherMvvm.sln.iml
