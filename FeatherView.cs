@@ -35,6 +35,7 @@ namespace FeatherMvvm
 				}
 				return _binder;
 			}
+			private set { _binder = value; }
 		}
 		private TViewModel _viewModel;
 
@@ -48,6 +49,7 @@ namespace FeatherMvvm
 				}
 				return _viewModel;
 			}
+			private set { _viewModel = value; }
 		}
 		
 		
@@ -55,6 +57,13 @@ namespace FeatherMvvm
 		void Apply()
 		{
 			
+		}
+		
+		protected override void Dispose(bool disposing)
+		{
+			Binder = null;
+			ViewModel = null;
+			base.Dispose(disposing);
 		}
 		
 		
