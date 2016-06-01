@@ -18,7 +18,8 @@ namespace FeatherMvvm.Messaging
 		public object Message { get; set; }
 		public string MessageTag { get; set; }
 		
-		public MessageEventArgs(object message,string messageTag)
+		
+		public MessageEventArgs(string messageTag,object message = null)
 		{
 			Message = message;
 			MessageTag = messageTag;
