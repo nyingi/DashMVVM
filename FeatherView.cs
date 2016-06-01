@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Windows.Forms;
+using FeatherMvvm.Messaging;
 
 namespace FeatherMvvm
 {
@@ -21,6 +22,23 @@ namespace FeatherMvvm
 	public  class FeatherView<TViewModel> : Form where TViewModel : FeatherViewModel , new()
 	{
 		
+
+		public IMessageBus MessageBus
+		{
+			get;
+			set;
+		}
+
+		
+		public FeatherView()
+		{
+			
+		}
+		
+		public FeatherView(IMessageBus messageBus)
+		{
+			MessageBus = messageBus;
+		}
 		
 		
 		private FeatherBinder<TViewModel> _binder;
@@ -46,6 +64,7 @@ namespace FeatherMvvm
 				if(_viewModel == null)
 				{
 					_viewModel = new TViewModel();
+					_viewModel.MessageBus = MessageBus;
 				}
 				return _viewModel;
 			}

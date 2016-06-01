@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using FeatherMvvm.Messaging;
 
 namespace FeatherMvvm
 {
@@ -20,6 +21,9 @@ namespace FeatherMvvm
 	/// </summary>
 	public class FeatherViewModel : INotifyPropertyChanged
 	{
+		
+		internal IMessageBus MessageBus { get; set; }
+		
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		protected void OnPropertyChanged([CallerMemberName] string propertyName = null)

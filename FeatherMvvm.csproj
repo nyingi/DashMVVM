@@ -51,7 +51,12 @@
     <Compile Include="FeatherBinder.cs" />
     <Compile Include="FeatherView.cs" />
     <Compile Include="FeatherViewModel.cs" />
+    <Compile Include="Messaging\IMessageBus.cs" />
+    <Compile Include="Messaging\MessageEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Messaging" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
