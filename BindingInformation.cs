@@ -13,13 +13,16 @@ namespace FeatherMvvm
 	/// <summary>
 	/// Description of BindingInformation.
 	/// </summary>
-	public class BindingInformation<TItem>
+	public class BindingInformation<TItem,TViewModel>  where TViewModel : FeatherViewModel , new()
 	{
-		public BindingInformation(TItem item)
+		public BindingInformation(TItem item,FeatherBinder<TViewModel> binder)
 		{
 			ViewItem = item;
+			Binder = binder;
 		}
 		
 		public TItem ViewItem { get; private set; }
+		
+		public FeatherBinder<TViewModel> Binder { get; set; }
 	}
 }

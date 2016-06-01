@@ -36,7 +36,7 @@ namespace FeatherMvvm
 			_viewModel.Apply();
 		}
 		
-		public BindingInformation<TViewObject> Bind<TViewObject,TViewProperty,TViewModelProperty>(TViewObject viewObj,Expression<Func<TViewObject,TViewProperty>> viewProperty,Expression<Func<TViewModel,TViewModelProperty>> viewModelProperty)
+		public BindingInformation<TViewObject,TViewModel> Bind<TViewObject,TViewProperty,TViewModelProperty>(TViewObject viewObj,Expression<Func<TViewObject,TViewProperty>> viewProperty,Expression<Func<TViewModel,TViewModelProperty>> viewModelProperty)
 		{
 			PropertyInfo vmProp = GetPropertyInfo(_viewModel, viewModelProperty);
 			PropertyInfo viewProp = GetPropertyInfo(viewObj, viewProperty);
@@ -54,7 +54,7 @@ namespace FeatherMvvm
 				}
 			};
 			AutoBindView(viewObj);
-			return new BindingInformation<TViewObject>(viewObj);
+			return new BindingInformation<TViewObject,TViewModel>(viewObj,this);
 		}
 		
 		private void AutoBindView(object obj)
