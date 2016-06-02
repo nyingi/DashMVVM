@@ -23,7 +23,7 @@ namespace FeatherMvvm
 	{
 		
 
-		public IMessageBus MessageBus
+		public virtual IMessageBus MessageBus
 		{
 			get;
 			set;

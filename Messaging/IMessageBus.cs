@@ -17,6 +17,6 @@ namespace FeatherMvvm.Messaging
 	{
 		event EventHandler<MessageEventArgs> MessagePassed;
 		
-		void SendMessage<TMessage>(TMessage message, string messageTag);
+		void SendMessage(string messageTag,object message = null);
 	}
 }
