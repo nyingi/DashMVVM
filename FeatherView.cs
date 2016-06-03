@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using FeatherMvvm.Messaging;
 
@@ -29,6 +30,13 @@ namespace FeatherMvvm
 			set;
 		}
 
+		
+		protected override void OnShown(EventArgs e)
+		{
+			base.OnShown(e);
+			Task.Run(async() => await ViewModel.OnStartAsync());
+		}
+		
 		
 		public FeatherView()
 		{

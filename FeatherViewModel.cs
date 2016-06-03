@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using FeatherMvvm.Messaging;
 
 namespace FeatherMvvm
@@ -86,6 +87,11 @@ namespace FeatherMvvm
 						type));
 
 			return propInfo;
+		}
+		
+		public virtual async Task OnStartAsync()
+		{
+			
 		}
 	}
 }
