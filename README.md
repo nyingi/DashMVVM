@@ -125,4 +125,19 @@ Using the MessageBus object, simply send out the desired message as show below.
 MessageBus.SendMessage(Messages.RefreshTodosList);
 ```
 
-###
+###5. Binding
+Binding allows you to link controls in your View to properties in your ViewModel. Two way binding is automatically supported for Textboxes and DateTimePickers.
+One-way binding is supported for ListViews. Binding for additional controls is planned.
+
+```C#
+private void DoBindings()
+{
+	Binder.Bind(lvTodos, obj => obj.Items, vm => vm.ListOfTodos)
+		.ViewItem.ItemSelectionChanged += (sender, e) => 
+	{
+		ViewModel.SelectedItem = e.Item.Tag as Todo;
+	};
+	Binder.Bind(btnDelete, btn => btn.Enabled, vm => vm.DeleteEnabled);
+	Binder.Apply();
+}
+```
