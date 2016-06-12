@@ -13,7 +13,9 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using FeatherMvvm.Binding;
 using FeatherMvvm.Messaging;
+using FeatherMvvm.Validation;
 
 namespace FeatherMvvm
 {
@@ -22,13 +24,14 @@ namespace FeatherMvvm
 	/// </summary>
 	public  class FeatherView<TViewModel> : Form where TViewModel : FeatherViewModel , new()
 	{
+		public event EventHandler<ValidationErrorEventArgs> ValidationErrorOccured;
 		
-
 		public virtual IMessageBus MessageBus
 		{
 			get;
 			set;
 		}
+		
 
 		
 		protected override void OnShown(EventArgs e)
@@ -38,7 +41,7 @@ namespace FeatherMvvm
 		}
 		
 		
-		public FeatherView()
+		public FeatherView() : this(null)
 		{
 			
 		}
@@ -58,6 +61,14 @@ namespace FeatherMvvm
 				if(_binder == null)
 				{
 					_binder = new FeatherBinder<TViewModel>(ViewModel,this);
+					_binder.Validator = new Validator();
+					_binder.Validator.ValidationErrorOccured += (object sender, ValidationErrorEventArgs e) => 
+					{
+						if(ValidationErrorOccured != null)
+						{
+							ValidationErrorOccured(sender,e);
+						}
+					};
 				}
 				return _binder;
 			}
@@ -93,6 +104,19 @@ namespace FeatherMvvm
 			base.Dispose(disposing);
 		}
 		
+		public FeatherView<TViewModel> AddValidation(Control control,Func<object,string> rule)
+		{
+			Binder.Validator.AddValidation(control, rule);
+			return this;
+		}
+		
+		public bool ViewDataIsValid
+		{
+			get
+			{
+				return Binder.Validator.DataIsValid;
+			}
+		}
 		
 	}
 }

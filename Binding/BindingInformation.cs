@@ -8,7 +8,7 @@
  */
 using System;
 
-namespace FeatherMvvm
+namespace FeatherMvvm.Binding
 {
 	/// <summary>
 	/// Description of BindingInformation.

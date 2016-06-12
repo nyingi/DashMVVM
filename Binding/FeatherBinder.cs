@@ -7,13 +7,15 @@
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Windows.Forms;
+using FeatherMvvm.Validation;
 
-namespace FeatherMvvm
+namespace FeatherMvvm.Binding
 {
 	/// <summary>
 	/// Description of BindingContext.
@@ -23,6 +25,8 @@ namespace FeatherMvvm
 		TViewModel _viewModel;
 		FeatherView<TViewModel> _view;
 		Dictionary<object,List<PropertyInfo>> _bindings;
+		internal Validator Validator { get; set; }
+		
 		public FeatherBinder(TViewModel viewModel,FeatherView<TViewModel> view)
 		{
 			_viewModel = viewModel;
@@ -35,7 +39,37 @@ namespace FeatherMvvm
 		{
 			_viewModel.Apply();
 		}
+
 		
+		
+		private void SetList(ListView lv,object viewModel,PropertyInfo viewModelProperty)
+		{
+			if(lv.InvokeRequired)
+			{
+				lv.Invoke((MethodInvoker)delegate
+					{
+						SetList(lv, viewModel, viewModelProperty);
+					});
+				return;
+			}
+			
+			IEnumerable list = viewModelProperty.GetValue(viewModel) as IEnumerable;
+		
+			lv.Items.Clear();
+			if(list == null)
+			{
+				return;
+			}
+			foreach(var item in list)
+			{
+				lv.Items.Add(item.ToString());
+			}
+		}
+		
+		public BindingInformation<TViewObject,TViewModel> BindList<TViewObject,TViewProperty,TViewModelProperty>(TViewObject viewObj,Expression<Func<TViewModel,TViewModelProperty>> viewModelProperty)
+		{
+			return Bind(viewObj, default(Expression<Func<TViewObject,TViewProperty>>), viewModelProperty);
+		}
 		public BindingInformation<TViewObject,TViewModel> Bind<TViewObject,TViewProperty,TViewModelProperty>(TViewObject viewObj,Expression<Func<TViewObject,TViewProperty>> viewProperty,Expression<Func<TViewModel,TViewModelProperty>> viewModelProperty)
 		{
 			PropertyInfo vmProp = GetPropertyInfo(_viewModel, viewModelProperty);
@@ -50,7 +84,14 @@ namespace FeatherMvvm
 			{
 				if(e.PropertyName == vmProp.Name)
 				{
-					SetValue(_viewModel, viewObj, vmProp, viewProp);
+					if(viewObj.GetType() == typeof(ListView))
+					{
+						SetList(viewObj as ListView, _viewModel, vmProp);						
+					}
+					else
+					{
+						SetValue(_viewModel, viewObj, vmProp, viewProp);
+					}
 				}
 			};
 			AutoBindView(viewObj);
@@ -121,6 +162,10 @@ namespace FeatherMvvm
 				return;
 			}
 			object intermediaryValue = source.GetValue(sourceObj);
+			if(!Validator.Validate(sourceObj,intermediaryValue))
+			{
+				return;
+			}
 			string value = intermediaryValue == null ? "" : intermediaryValue.ToString();
 			if(destination.PropertyType.GetInterfaces().Contains(typeof(IConvertible)))
 			{
@@ -152,6 +197,8 @@ namespace FeatherMvvm
 			}
 			return this;
 		}
+		
+		
 		
 		
 		private PropertyInfo GetPropertyInfo<TSource, TProperty>(
