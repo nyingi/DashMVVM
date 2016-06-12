@@ -24,7 +24,7 @@ namespace FeatherMvvm
 	/// </summary>
 	public  class FeatherView<TViewModel> : Form where TViewModel : FeatherViewModel , new()
 	{
-		public event EventHandler<ValidationErrorEventArgs> ValidationErrorOccured;
+		public event EventHandler<ValidationResultEventArgs> ControlValidated;
 		public event EventHandler ViewIsValid;
 		
 		public virtual IMessageBus MessageBus
@@ -63,11 +63,11 @@ namespace FeatherMvvm
 				{
 					_binder = new FeatherBinder<TViewModel>(ViewModel,this);
 					_binder.Validator = new Validator();
-					_binder.Validator.ValidationErrorOccured += (object sender, ValidationErrorEventArgs e) => 
+					_binder.Validator.ControlValidated += (object sender, ValidationResultEventArgs e) => 
 					{
-						if(ValidationErrorOccured != null)
+						if(ControlValidated != null)
 						{
-							ValidationErrorOccured(sender,e);
+							ControlValidated(sender,e);
 						}
 					};
 					_binder.Validator.ViewIsValid += (object sender, EventArgs e) => 

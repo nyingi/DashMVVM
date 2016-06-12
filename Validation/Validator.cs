@@ -17,7 +17,7 @@ namespace FeatherMvvm.Validation
 	/// </summary>
 	internal class Validator
 	{
-		internal event EventHandler<ValidationErrorEventArgs> ValidationErrorOccured;
+		internal event EventHandler<ValidationResultEventArgs> ControlValidated;
 		internal Dictionary<object,bool> _validityStates = new Dictionary<object, bool>();
 		internal event EventHandler ViewIsValid;
 		
@@ -39,15 +39,16 @@ namespace FeatherMvvm.Validation
 			{
 				return true;
 			}
-			foreach(var rule in Validations[obj])
+			foreach (var rule in Validations[obj])
 			{
 				string result = rule(value);
-				if(!string.IsNullOrEmpty(result))
+				_validityStates[obj] = string.IsNullOrEmpty(result);
+				if (ControlValidated != null)
 				{
-					_validityStates[obj] = false;
-					if(ValidationErrorOccured != null)
+					ControlValidated(this, new ValidationResultEventArgs(obj, result));
+					if (!_validityStates[obj])
 					{
-						ValidationErrorOccured(this, new ValidationErrorEventArgs(obj, result));
+						return false;
 					}
 				}
 			}

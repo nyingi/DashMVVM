@@ -14,7 +14,7 @@ namespace FeatherMvvm.Validation
 	/// <summary>
 	/// Description of ValidationErrorEventArgs.
 	/// </summary>
-	public class ValidationErrorEventArgs
+	public class ValidationResultEventArgs
 	{
 
 		public object ValidatableObject
@@ -29,7 +29,7 @@ namespace FeatherMvvm.Validation
 			set;
 		}
 
-		public ValidationErrorEventArgs(object validatableObject,string error)
+		public ValidationResultEventArgs(object validatableObject,string error)
 		{
 			Error = error;
 			ValidatableObject = validatableObject;
