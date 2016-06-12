@@ -62,7 +62,8 @@ namespace FeatherMvvm.Binding
 			}
 			foreach(var item in list)
 			{
-				lv.Items.Add(item.ToString());
+				ListViewItem lvi = lv.Items.Add(item.ToString());
+				lvi.Tag = item;
 			}
 		}
 		
@@ -104,6 +105,11 @@ namespace FeatherMvvm.Binding
 			{
 				TextBox txt = obj as TextBox;
 				txt.TextChanged += (sender, e) => ViewChanged(txt,vw => vw.Text);
+			}
+			if(obj.GetType() == typeof(DateTimePicker))
+			{
+				DateTimePicker dtp = obj as DateTimePicker;
+				dtp.ValueChanged += (sender, e) => ViewChanged(dtp,vw => vw.Value);
 			}
 		}
 		

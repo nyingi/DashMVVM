@@ -25,6 +25,7 @@ namespace FeatherMvvm
 	public  class FeatherView<TViewModel> : Form where TViewModel : FeatherViewModel , new()
 	{
 		public event EventHandler<ValidationErrorEventArgs> ValidationErrorOccured;
+		public event EventHandler ViewIsValid;
 		
 		public virtual IMessageBus MessageBus
 		{
@@ -41,7 +42,7 @@ namespace FeatherMvvm
 		}
 		
 		
-		public FeatherView() : this(null)
+		public FeatherView() : this(Messager.Instance)
 		{
 			
 		}
@@ -67,6 +68,13 @@ namespace FeatherMvvm
 						if(ValidationErrorOccured != null)
 						{
 							ValidationErrorOccured(sender,e);
+						}
+					};
+					_binder.Validator.ViewIsValid += (object sender, EventArgs e) => 
+					{
+						if(ViewIsValid != null)
+						{
+							ViewIsValid(sender,e);
 						}
 					};
 				}

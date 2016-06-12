@@ -19,6 +19,7 @@ namespace FeatherMvvm.Validation
 	{
 		internal event EventHandler<ValidationErrorEventArgs> ValidationErrorOccured;
 		internal Dictionary<object,bool> _validityStates = new Dictionary<object, bool>();
+		internal event EventHandler ViewIsValid;
 		
 		public Validator()
 		{
@@ -50,6 +51,12 @@ namespace FeatherMvvm.Validation
 					}
 				}
 			}
+			
+			if(ViewIsValid != null && DataIsValid)
+			{
+				ViewIsValid(this, EventArgs.Empty);
+			}
+			
 			return _validityStates[obj];
 		}
 		

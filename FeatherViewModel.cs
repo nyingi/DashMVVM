@@ -23,7 +23,7 @@ namespace FeatherMvvm
 	public class FeatherViewModel : INotifyPropertyChanged
 	{
 		
-		internal IMessageBus MessageBus { get; set; }
+		public IMessageBus MessageBus { get; set; }
 		
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -93,5 +93,7 @@ namespace FeatherMvvm
 		{
 			
 		}
+		
+		
 	}
 }
