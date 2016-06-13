@@ -8,7 +8,7 @@
  */
 using System;
 
-namespace FeatherMvvm.Messaging
+namespace DashMvvm.Messaging
 {
 	/// <summary>
 	/// Description of Messager.
