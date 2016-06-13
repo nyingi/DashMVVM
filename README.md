@@ -67,7 +67,7 @@ public static string NotEmpty(object obj)
 	{
 		return "A value must be provided for this field";
 	}
-	return "";
+	return string.Empty;
 }
 ```
 
