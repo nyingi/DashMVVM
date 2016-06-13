@@ -7,22 +7,18 @@
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using FeatherMvvm.Binding;
-using FeatherMvvm.Messaging;
-using FeatherMvvm.Validation;
+using DashMvvm.Binding;
+using DashMvvm.Messaging;
+using DashMvvm.Validation;
 
-namespace FeatherMvvm
+namespace DashMvvm
 {
 	/// <summary>
 	/// Description of IView.
 	/// </summary>
-	public  class FeatherView<TViewModel> : Form where TViewModel : FeatherViewModel , new()
+	public  class DashView<TViewModel> : Form where TViewModel : DashViewModel , new()
 	{
 		public event EventHandler<ValidationResultEventArgs> ControlValidated;
 		public event EventHandler ViewIsValid;
@@ -42,26 +38,26 @@ namespace FeatherMvvm
 		}
 		
 		
-		public FeatherView() : this(Messager.Instance)
+		public DashView() : this(Messager.Instance)
 		{
 			
 		}
 		
-		public FeatherView(IMessageBus messageBus)
+		public DashView(IMessageBus messageBus)
 		{
 			MessageBus = messageBus;
 		}
 		
 		
-		private FeatherBinder<TViewModel> _binder;
+		private DashBinder<TViewModel> _binder;
 
-		public FeatherBinder<TViewModel> Binder
+		public DashBinder<TViewModel> Binder
 		{
 			get
 			{
 				if(_binder == null)
 				{
-					_binder = new FeatherBinder<TViewModel>(ViewModel,this);
+					_binder = new DashBinder<TViewModel>(ViewModel,this);
 					_binder.Validator = new Validator();
 					_binder.Validator.ControlValidated += (object sender, ValidationResultEventArgs e) => 
 					{
@@ -112,7 +108,7 @@ namespace FeatherMvvm
 			base.Dispose(disposing);
 		}
 		
-		public FeatherView<TViewModel> AddValidation(Control control,Func<object,string> rule)
+		public DashView<TViewModel> AddValidation(Control control,Func<object,string> rule)
 		{
 			Binder.Validator.AddValidation(control, rule);
 			return this;

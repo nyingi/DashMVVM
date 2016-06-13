@@ -9,7 +9,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace FeatherMvvm.Validation
+namespace DashMvvm.Validation
 {
 	/// <summary>
 	/// Description of ValidationErrorEventArgs.

@@ -4,7 +4,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # SharpDevelop 5.1
 VisualStudioVersion = 12.0.20827.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeatherMvvm", "FeatherMvvm.csproj", "{2E45C45C-2CED-460D-8A10-730DE8189919}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashMvvm", "DashMvvm.csproj", "{2E45C45C-2CED-460D-8A10-730DE8189919}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

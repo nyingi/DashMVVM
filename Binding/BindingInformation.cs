@@ -8,14 +8,14 @@
  */
 using System;
 
-namespace FeatherMvvm.Binding
+namespace DashMvvm.Binding
 {
 	/// <summary>
 	/// Description of BindingInformation.
 	/// </summary>
-	public class BindingInformation<TItem,TViewModel>  where TViewModel : FeatherViewModel , new()
+	public class BindingInformation<TItem,TViewModel>  where TViewModel : DashViewModel , new()
 	{
-		public BindingInformation(TItem item,FeatherBinder<TViewModel> binder)
+		public BindingInformation(TItem item,DashBinder<TViewModel> binder)
 		{
 			ViewItem = item;
 			Binder = binder;
@@ -23,6 +23,6 @@ namespace FeatherMvvm.Binding
 		
 		public TItem ViewItem { get; private set; }
 		
-		public FeatherBinder<TViewModel> Binder { get; set; }
+		public DashBinder<TViewModel> Binder { get; set; }
 	}
 }

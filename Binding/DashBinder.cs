@@ -13,21 +13,21 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Windows.Forms;
-using FeatherMvvm.Validation;
+using DashMvvm.Validation;
 
-namespace FeatherMvvm.Binding
+namespace DashMvvm.Binding
 {
 	/// <summary>
 	/// Description of BindingContext.
 	/// </summary>
-	public class FeatherBinder<TViewModel> where TViewModel : FeatherViewModel , new()
+	public class DashBinder<TViewModel> where TViewModel : DashViewModel , new()
 	{
 		TViewModel _viewModel;
-		FeatherView<TViewModel> _view;
+		DashView<TViewModel> _view;
 		Dictionary<object,List<PropertyInfo>> _bindings;
 		internal Validator Validator { get; set; }
 		
-		public FeatherBinder(TViewModel viewModel,FeatherView<TViewModel> view)
+		public DashBinder(TViewModel viewModel,DashView<TViewModel> view)
 		{
 			_viewModel = viewModel;
 			_view = view;
@@ -186,7 +186,7 @@ namespace FeatherMvvm.Binding
 			}
 		}
 		
-		public FeatherBinder<TViewModel> ViewChanged<TViewObject,TViewProperty>(TViewObject viewObj,Expression<Func<TViewObject,TViewProperty>> viewProperty)
+		public DashBinder<TViewModel> ViewChanged<TViewObject,TViewProperty>(TViewObject viewObj,Expression<Func<TViewObject,TViewProperty>> viewProperty)
 		{
 			
 			if(!_bindings.ContainsKey(viewObj))

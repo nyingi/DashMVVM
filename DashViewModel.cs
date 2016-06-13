@@ -13,14 +13,14 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using FeatherMvvm.Messaging;
+using DashMvvm.Messaging;
 
-namespace FeatherMvvm
+namespace DashMvvm
 {
 	/// <summary>
 	/// Description of MyClass.
 	/// </summary>
-	public class FeatherViewModel : INotifyPropertyChanged
+	public class DashViewModel : INotifyPropertyChanged
 	{
 		
 		public IMessageBus MessageBus { get; set; }
