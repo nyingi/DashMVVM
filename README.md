@@ -143,4 +143,4 @@ private void DoBindings()
 ```
 
 ###6. Example App
-Got to the [FeatherTodo](https://github.com/nyingi/FeatherTodo/) app which implements all of the above features for examples on how to utilize FeatherMvvm 
+Go to the [FeatherTodo](https://github.com/nyingi/FeatherTodo/) app which implements all of the above features for examples on how to utilize FeatherMvvm 
