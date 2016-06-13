@@ -1,10 +1,10 @@
-# FeatherMvvm
+# DashMVVM
 Inspired by MvvmCross for Xamarin.Android and Xamarin.iOS, this is a basic Mvvm library for WinForms that seeks to channel the ease, structure and 
 clarity that simple, robust and predictable databinding brings to apps.
 
 ## Components
 ### 1. Views
-FeatherMvvm has a base class for views. This base class inherits System.Windows.Forms.Form thus when you base your views on this, not only do 
+DashMVVM has a base class for views. This base class inherits System.Windows.Forms.Form thus when you base your views on this, not only do 
 you gain extended binding functionality, you also maintain the drag-n-drop form building capabilities in Visual Studio.
 
 ### 2. ViewModels
@@ -21,13 +21,13 @@ The binder links components in the View to properties in the ViewModel to enforc
 
 ## Usage
 ### 1. Grab Reference From Nuget.
-Using nuget, search for FeatherMvvm and add to your project.
+Using nuget, search for DashMVVM and add to your project.
 
 ### 2. Create ViewModels. 
-These are nothing more than C# classes that extend FeatherViewModel.
+These are nothing more than C# classes that extend DashViewModel.
 
 ```C#
-public class EditTodoViewModel : FeatherViewModel
+public class EditTodoViewModel : DashViewModel
 {
 	string _description;
 	public string Description
@@ -44,16 +44,16 @@ public class EditTodoViewModel : FeatherViewModel
 }
 ```
 ### 3. Create Your Views
-Add a new form in Visual Studio or your favourite IDE. Edit the form's code so it no longer extends 'Form' but 'FeatherView'.
+Add a new form in Visual Studio or your favourite IDE. Edit the form's code so it no longer extends 'Form' but 'DashView'.
 
 ```C#
-public partial class EditTodoView : FeatherView<EditTodoViewModel>
+public partial class EditTodoView : DashView<EditTodoViewModel>
 {
 
 }
 ```
 
-Please note, FeatherView is generic and expects the type of the ViewModel to be supplied.
+Please note, DashView is generic and expects the type of the ViewModel to be supplied.
 
 ### 4. Configuring Validation
 To configure validation do the following
@@ -83,7 +83,7 @@ Each time a view component gets changed, its value is validated. If the value is
 ```C#
 void SubscribeEvents()
 {
-	ValidationErrorOccured += (object sender, FeatherMvvm.Validation.ValidationErrorEventArgs e) => 
+	ValidationErrorOccured += (object sender, DashMVVM.Validation.ValidationErrorEventArgs e) => 
 	{
 		cmdSave.Enabled = false;
 		MessageBox.Show(e.Error);
@@ -104,7 +104,7 @@ MessageBus.MessagePassed += MessageBus_MessagePassed;
 ```
 
 ```C#
-void MessageBus_MessagePassed(object sender, FeatherMvvm.Messaging.MessageEventArgs e)
+void MessageBus_MessagePassed(object sender, DashMVVM.Messaging.MessageEventArgs e)
 {
     switch(e.MessageTag)
     {
@@ -143,4 +143,4 @@ private void DoBindings()
 ```
 
 ###6. Example App
-Go to the [FeatherTodo](https://github.com/nyingi/FeatherTodo/) app which implements all of the above features for examples on how to utilize FeatherMvvm 
+Go to the [FeatherTodo](https://github.com/nyingi/FeatherTodo/) app which implements all of the above features for examples on how to utilize DashMVVM 
