@@ -58,7 +58,7 @@ Please note, DashView is generic and expects the type of the ViewModel to be sup
 ### 4. Configuring Validation
 To configure validation do the following
 #### 1. Create Validation Rules
-Validation rules are simple functions that take in an object and return an validation error string if error occurs. If data is valid the the function should return a blank string. Example
+Validation rules are simple functions that take in an object and return a validation error string if error occurs. If data is valid the the function should return a blank string. Example
 
 ```C#
 public static string NotEmpty(object obj)
@@ -77,9 +77,12 @@ Your View inherits an 'AddValidation' method. Use this method to register a cont
 ```C#
 AddValidation(txtDescription, NotEmpty);
 ```
-####3. Subscribe To Validate Error Occured Event
-Each time a view component gets changed, its value is validated. If the value is invalid then a 'ValidationErrorOccured' event is fired. Subscribe to it to react to invalid states. Similarly each time a component is changed if the entire view is valid, then a 'ViewIsValid' event is fired as shown below. By also subscribing to this, you can manage the state of your view.
+####3. Subscribe To Control Validated Event
+Each time a view component gets changed, its value is validated. After validation of the control, a 'ControlValidated' event is fired. If the value is invalid then an error
+string is included in the ValidationResultEventArgs which is passed into your event handling method.
 
+Additionally, if all the entries in a view are valid, a 'ViewIsValid' event fired if your edit to a control also contains correct data.
+You can use these events to manage the state of your view as shown below. 
 ```C#
 void SubscribeEvents()
 {
