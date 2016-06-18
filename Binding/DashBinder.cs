@@ -14,6 +14,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Windows.Forms;
 using DashMvvm.Validation;
+using FeatherMvvm.Attributes;
 
 namespace DashMvvm.Binding
 {
@@ -41,6 +42,46 @@ namespace DashMvvm.Binding
 		}
 
 		
+		private void BindComboBox(ComboBox cbo, object viewModel,PropertyInfo viewModelProperty)
+		{
+			if(cbo.InvokeRequired)
+			{
+				cbo.Invoke((MethodInvoker)delegate
+					{
+						BindComboBox(cbo, viewModel, viewModelProperty);
+					});
+				return;
+			}
+			
+			IEnumerable list = viewModelProperty.GetValue(viewModel) as IEnumerable;
+			SelectedListItemPropertyNameAttribute selectedPropAttrib = viewModelProperty.GetCustomAttribute
+				<SelectedListItemPropertyNameAttribute>();
+			
+			if(selectedPropAttrib != null)
+			{
+				PropertyInfo destProperty = viewModel.GetType()
+					.GetProperty(selectedPropAttrib.SelectedListItemPropertyName);
+				if(destProperty != null)
+				{
+					cbo.SelectedValueChanged += (sender, e) => 
+						SetValue(cbo,viewModel,cbo.GetType().GetProperty("Text"),destProperty);
+				}
+			}
+			
+			
+			cbo.Items.Clear();
+			
+			if(list == null)
+			{
+				return;
+			}
+			
+			foreach(var item in list)
+			{
+				cbo.Items.Add(item);
+			}
+			
+		}
 		
 		private void SetList(ListView lv,object viewModel,PropertyInfo viewModelProperty)
 		{
@@ -88,6 +129,10 @@ namespace DashMvvm.Binding
 					if(viewObj.GetType() == typeof(ListView))
 					{
 						SetList(viewObj as ListView, _viewModel, vmProp);						
+					}
+					else if(viewObj.GetType() == typeof(ComboBox))
+					{
+						BindComboBox(viewObj as ComboBox, _viewModel, vmProp);
 					}
 					else
 					{

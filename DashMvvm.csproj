@@ -64,6 +64,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\SelectedListItemPropertyNameAttribute.cs" />
     <Compile Include="Binding\BindingInformation.cs" />
     <Compile Include="Binding\DashBinder.cs" />
     <Compile Include="DashView.cs" />
@@ -78,6 +79,7 @@
   <ItemGroup>
     <Folder Include="Messaging" />
     <Folder Include="Binding" />
+    <Folder Include="Attributes" />
     <Folder Include="Validation" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
