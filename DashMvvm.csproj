@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\SelectedListItemPropertyNameAttribute.cs" />
+    <Compile Include="Attributes\SourceListPropertyName.cs" />
     <Compile Include="Binding\BindingInformation.cs" />
     <Compile Include="Binding\DashBinder.cs" />
     <Compile Include="DashView.cs" />
