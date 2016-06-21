@@ -65,6 +65,31 @@ namespace DashMvvm.Binding
 				{
 					cbo.SelectedValueChanged += (sender, e) => 
 						SetValue(cbo,viewModel,cbo.GetType().GetProperty("Text"),destProperty);
+					
+					
+					(viewModel as DashViewModel).PropertyChanged += (sender, e) => 
+					{
+						Action setValuesAction = () =>
+						{
+							var newValue = destProperty.GetValue(viewModel);
+							if(newValue == null || string.IsNullOrEmpty(newValue.ToString()))
+							{
+								cbo.SelectedIndex = -1;
+							}
+							else
+							{
+								cbo.Text = newValue.ToString();
+							}
+						};
+						if(cbo.InvokeRequired)
+						{
+							cbo.Invoke(setValuesAction);
+						}
+						else
+						{
+							setValuesAction();
+						}
+					};
 				}
 			}
 			
