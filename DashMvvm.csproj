@@ -68,6 +68,7 @@
     <Compile Include="Binding\BindingInformation.cs" />
     <Compile Include="Binding\DashBinder.cs" />
     <Compile Include="DashView.cs" />
+    <Compile Include="DashViewHandle.cs" />
     <Compile Include="DashViewModel.cs" />
     <Compile Include="Messaging\IMessageBus.cs" />
     <Compile Include="Messaging\MessageEventArgs.cs" />

@@ -14,6 +14,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Windows.Forms;
 using DashMvvm.Validation;
+using FeatherMvvm;
 using FeatherMvvm.Attributes;
 
 namespace DashMvvm.Binding
@@ -24,11 +25,11 @@ namespace DashMvvm.Binding
 	public class DashBinder<TViewModel> where TViewModel : DashViewModel , new()
 	{
 		TViewModel _viewModel;
-		DashView<TViewModel> _view;
+		DashViewHandle<TViewModel> _view;
 		Dictionary<object,List<PropertyInfo>> _bindings;
 		internal Validator Validator { get; set; }
 		
-		public DashBinder(TViewModel viewModel,DashView<TViewModel> view)
+		public DashBinder(TViewModel viewModel,DashViewHandle<TViewModel> view)
 		{
 			_viewModel = viewModel;
 			_view = view;
@@ -78,7 +79,14 @@ namespace DashMvvm.Binding
 							}
 							else
 							{
-								cbo.Text = newValue.ToString();
+								for(int i = 0; i < cbo.Items.Count; i++)
+								{
+									if(cbo.Items[i].ToString() == newValue.ToString())
+									{
+										cbo.SelectedIndex = i;
+										break;
+									}
+								}
 							}
 						};
 						if(cbo.InvokeRequired)
@@ -224,7 +232,7 @@ namespace DashMvvm.Binding
 		
 		private void SetValue(object sourceObj, object destinationObj, PropertyInfo source, PropertyInfo destination)
 		{
-			Control viewControl = (Control)_view;
+			Control viewControl = (Control)_view.Form;
 			if(viewControl.InvokeRequired)
 			{
 				viewControl.Invoke

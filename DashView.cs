@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using DashMvvm.Binding;
 using DashMvvm.Messaging;
 using DashMvvm.Validation;
+using FeatherMvvm;
 
 namespace DashMvvm
 {
@@ -29,7 +30,8 @@ namespace DashMvvm
 			set;
 		}
 		
-
+		private DashViewHandle<TViewModel> _viewHandle;
+		
 		
 		protected override void OnShown(EventArgs e)
 		{
@@ -46,6 +48,21 @@ namespace DashMvvm
 		public DashView(IMessageBus messageBus)
 		{
 			MessageBus = messageBus;
+			_viewHandle = new DashViewHandle<TViewModel>(messageBus, this);
+			_viewHandle.ControlValidated += (sender, e) => 
+			{
+				if(ControlValidated != null)
+				{
+					ControlValidated(sender,e);
+				}
+			};
+			_viewHandle.ViewIsValid += (sender, e) => 
+			{
+				if(ViewIsValid != null)
+				{
+					ViewIsValid(sender,e);
+				}
+			};
 		}
 		
 		
@@ -55,28 +72,8 @@ namespace DashMvvm
 		{
 			get
 			{
-				if(_binder == null)
-				{
-					_binder = new DashBinder<TViewModel>(ViewModel,this);
-					_binder.Validator = new Validator();
-					_binder.Validator.ControlValidated += (object sender, ValidationResultEventArgs e) => 
-					{
-						if(ControlValidated != null)
-						{
-							ControlValidated(sender,e);
-						}
-					};
-					_binder.Validator.ViewIsValid += (object sender, EventArgs e) => 
-					{
-						if(ViewIsValid != null)
-						{
-							ViewIsValid(sender,e);
-						}
-					};
-				}
-				return _binder;
+				return _viewHandle.Binder;
 			}
-			private set { _binder = value; }
 		}
 		private TViewModel _viewModel;
 
@@ -84,14 +81,8 @@ namespace DashMvvm
 		{
 			get
 			{
-				if(_viewModel == null)
-				{
-					_viewModel = new TViewModel();
-					_viewModel.MessageBus = MessageBus;
-				}
-				return _viewModel;
+				return _viewHandle.ViewModel;
 			}
-			private set { _viewModel = value; }
 		}
 		
 		
@@ -103,14 +94,13 @@ namespace DashMvvm
 		
 		protected override void Dispose(bool disposing)
 		{
-			Binder = null;
-			ViewModel = null;
+			_viewHandle.Dispose();
 			base.Dispose(disposing);
 		}
 		
 		public DashView<TViewModel> AddValidation(Control control,Func<object,string> rule)
 		{
-			Binder.Validator.AddValidation(control, rule);
+			_viewHandle.Binder.Validator.AddValidation(control, rule);
 			return this;
 		}
 		
@@ -118,7 +108,7 @@ namespace DashMvvm
 		{
 			get
 			{
-				return Binder.Validator.DataIsValid;
+				return _viewHandle.Binder.Validator.DataIsValid;
 			}
 		}
 		
