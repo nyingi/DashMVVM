@@ -64,10 +64,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\ListViewColumnAttribute.cs" />
     <Compile Include="Attributes\SelectedListItemPropertyNameAttribute.cs" />
     <Compile Include="Binding\BindingInformation.cs" />
+    <Compile Include="Binding\Components\ListViewHelper.cs" />
     <Compile Include="Binding\DashBinder.cs" />
-    <Compile Include="DashView.cs" />
+    <Compile Include="DashView.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="DashViewHandle.cs" />
     <Compile Include="DashViewModel.cs" />
     <Compile Include="Messaging\IMessageBus.cs" />
@@ -77,11 +81,6 @@
     <Compile Include="Validation\ValidationResultEventArgs.cs" />
     <Compile Include="Validation\Validator.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Messaging" />
-    <Folder Include="Binding" />
-    <Folder Include="Attributes" />
-    <Folder Include="Validation" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -33,6 +33,7 @@ namespace FeatherMvvm
 		}
 		
 		
+		[Obsolete("Only maintained for backward compatibility. DON'T USE. Will be retired in version 0.1.0")]
 		public DashViewHandle(IMessageBus messageBus,Form form)
 		{
 			MessageBus = messageBus;	

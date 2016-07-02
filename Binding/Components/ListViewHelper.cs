@@ -1,0 +1,131 @@
+﻿/*
+ * Created by SharpDevelop.
+ * User: Nyingi
+ * Date: 26-Jun-16
+ * Time: 11:00 AM
+ * 
+ * To change this template use Tools | Options | Coding | Edit Standard Headers.
+ */
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Windows.Forms;
+using FeatherMvvm.Attributes;
+
+namespace FeatherMvvm.Binding.Components
+{
+	/// <summary>
+	/// Description of ListViewHelper.
+	/// </summary>
+	internal class ListViewHelper
+	{
+		public ListViewHelper()
+		{
+		}
+		
+		public void PopulateList(ListView lv,object viewModel,PropertyInfo viewModelProperty)
+		{
+			if(lv.InvokeRequired)
+			{
+				lv.Invoke((MethodInvoker)delegate
+					{
+						PopulateList(lv, viewModel, viewModelProperty);
+					});
+				return;
+			}
+			
+			IEnumerable list = viewModelProperty.GetValue(viewModel) as IEnumerable;
+		
+			lv.Items.Clear();
+			if(list == null)
+			{
+				return;
+			}
+			var listedProps = GetColumnHeaderProperties(viewModelProperty);
+			if (listedProps != null && listedProps.Count > 0)
+			{
+				foreach (var item in list)
+				{
+					
+					ListViewItem lvi = lv.Items.Add(listedProps[0].GetValue(item).ToString());
+					for (int i = 1; i < listedProps.Count; i++)
+					{
+						lvi.SubItems.Add(listedProps[1].GetValue(item).ToString());
+					}
+					lvi.Tag = item;
+				}
+			}
+			else
+			{
+				foreach (var item in list)
+				{
+					
+					ListViewItem lvi = lv.Items.Add(item.ToString());
+					lvi.Tag = item;
+				}
+			}
+		}
+		
+		private List<PropertyInfo> GetColumnHeaderProperties(PropertyInfo vmProp)
+		{
+			if(vmProp.PropertyType.GenericTypeArguments.Length == 0)
+			{
+				throw new Exception("Only lists are currently supported for supplying ListView columns");
+			}
+			var columnSource = Activator.CreateInstance( vmProp.PropertyType.GenericTypeArguments[0]);
+			return columnSource.GetType()
+				.GetProperties().Where(a => a.GetCustomAttribute<ListViewColumnAttribute>() != null && a.CanRead)
+				.ToList();
+		}
+		
+		public void AddListViewColumns(ListView lv, PropertyInfo vmProp)
+		{
+			if(lv.InvokeRequired)
+			{
+				lv.Invoke((MethodInvoker)delegate
+					{
+						AddListViewColumns(lv, vmProp);
+					});
+				return;
+			}
+			lv.Columns.Clear();
+			lv.View = View.Details;
+			List<float> widthWeights = new List<float>();
+			if(vmProp.PropertyType.GenericTypeArguments.Length == 0)
+			{
+				throw new Exception("ListView columns are currently only generated from lists");
+			}
+			Type listType = vmProp.PropertyType.GenericTypeArguments[0];
+			var columnSource = Activator.CreateInstance(listType);
+			foreach(PropertyInfo propInfo in columnSource.GetType().GetProperties())
+			{
+				if(propInfo.CanRead == false)
+				{
+					continue;
+				}
+				ListViewColumnAttribute colAttrib = propInfo.GetCustomAttribute<ListViewColumnAttribute>(false);
+				if(colAttrib != null)
+				{
+					lv.Columns.Add(colAttrib.Title);					
+					widthWeights.Add(colAttrib.WidthWeight);
+				}
+			}
+			
+			Action sizeColumns = () =>
+			{
+				float totalWeight = widthWeights.Sum();
+				for(int i = 0; i < lv.Columns.Count; i++)
+				{
+					float columnWidthFraction = widthWeights[i] / totalWeight; 
+					var width = lv.Width * columnWidthFraction;
+					lv.Columns[i].Width = (int)Math.Ceiling(width);
+				}
+			};
+			
+			sizeColumns();
+			lv.Resize += (sender, e) => sizeColumns();
+		}
+	}
+}

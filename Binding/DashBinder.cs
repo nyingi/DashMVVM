@@ -16,6 +16,7 @@ using System.Windows.Forms;
 using DashMvvm.Validation;
 using FeatherMvvm;
 using FeatherMvvm.Attributes;
+using FeatherMvvm.Binding.Components;
 
 namespace DashMvvm.Binding
 {
@@ -116,35 +117,15 @@ namespace DashMvvm.Binding
 			
 		}
 		
-		private void SetList(ListView lv,object viewModel,PropertyInfo viewModelProperty)
-		{
-			if(lv.InvokeRequired)
-			{
-				lv.Invoke((MethodInvoker)delegate
-					{
-						SetList(lv, viewModel, viewModelProperty);
-					});
-				return;
-			}
-			
-			IEnumerable list = viewModelProperty.GetValue(viewModel) as IEnumerable;
 		
-			lv.Items.Clear();
-			if(list == null)
-			{
-				return;
-			}
-			foreach(var item in list)
-			{
-				ListViewItem lvi = lv.Items.Add(item.ToString());
-				lvi.Tag = item;
-			}
-		}
 		
 		public BindingInformation<TViewObject,TViewModel> BindList<TViewObject,TViewProperty,TViewModelProperty>(TViewObject viewObj,Expression<Func<TViewModel,TViewModelProperty>> viewModelProperty)
 		{
 			return Bind(viewObj, default(Expression<Func<TViewObject,TViewProperty>>), viewModelProperty);
 		}
+
+		
+
 		public BindingInformation<TViewObject,TViewModel> Bind<TViewObject,TViewProperty,TViewModelProperty>(TViewObject viewObj,Expression<Func<TViewObject,TViewProperty>> viewProperty,Expression<Func<TViewModel,TViewModelProperty>> viewModelProperty)
 		{
 			PropertyInfo vmProp = GetPropertyInfo(_viewModel, viewModelProperty);
@@ -161,7 +142,14 @@ namespace DashMvvm.Binding
 				{
 					if(viewObj.GetType() == typeof(ListView))
 					{
-						SetList(viewObj as ListView, _viewModel, vmProp);						
+						if(viewProp.Name == "Items")
+						{
+							new ListViewHelper().PopulateList(viewObj as ListView, _viewModel, vmProp);
+						}
+						else if(viewProp.Name == "Columns")
+						{
+							new ListViewHelper().AddListViewColumns(viewObj as ListView, vmProp);
+						}
 					}
 					else if(viewObj.GetType() == typeof(ComboBox))
 					{
