@@ -74,7 +74,12 @@ namespace FeatherMvvm.Binding.Components
 			{
 				throw new Exception("Only lists are currently supported for supplying ListView columns");
 			}
-			var columnSource = Activator.CreateInstance( vmProp.PropertyType.GenericTypeArguments[0]);
+		    var type = vmProp.PropertyType.GenericTypeArguments[0];
+		    if (type.IsInterface)
+		    {
+		        return null;
+		    }
+			var columnSource = Activator.CreateInstance(type);
 			return columnSource.GetType()
 				.GetProperties().Where(a => a.GetCustomAttribute<ListViewColumnAttribute>() != null && a.CanRead)
 				.ToList();
