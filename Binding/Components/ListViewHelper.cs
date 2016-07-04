@@ -48,11 +48,16 @@ namespace FeatherMvvm.Binding.Components
 			{
 				foreach (var item in list)
 				{
-					
-					ListViewItem lvi = lv.Items.Add(listedProps[0].GetValue(item).ToString());
+				    var cellValue = listedProps[0].GetValue(item);
+				    if (cellValue == null)
+				    {
+				        cellValue = "";
+				    }
+
+					ListViewItem lvi = lv.Items.Add(cellValue.ToString());
 					for (int i = 1; i < listedProps.Count; i++)
 					{
-						lvi.SubItems.Add(listedProps[1].GetValue(item).ToString());
+						lvi.SubItems.Add(listedProps[i].GetValue(item).ToString());
 					}
 					lvi.Tag = item;
 				}
