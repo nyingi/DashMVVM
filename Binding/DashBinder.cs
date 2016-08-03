@@ -174,7 +174,7 @@ namespace DashMvvm.Binding
 			if(obj.GetType() == typeof(TextBox))
 			{
 				TextBox txt = obj as TextBox;
-				txt.TextChanged += (sender, e) => ViewChanged(txt,vw => vw.Text);
+				txt.KeyUp += (sender, e) => ViewChanged(txt,vw => vw.Text);
 			}
 			if(obj.GetType() == typeof(DateTimePicker))
 			{
