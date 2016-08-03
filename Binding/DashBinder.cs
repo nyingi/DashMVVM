@@ -155,6 +155,10 @@ namespace DashMvvm.Binding
 					{
 						BindComboBox(viewObj as ComboBox, _viewModel, vmProp);
 					}
+					else if(viewObj.GetType() == typeof(CheckBox))
+					{
+					    new CheckboxHelper(SetValue).Bind(viewObj as CheckBox, _viewModel,vmProp);
+					}
 					else
 					{
 						SetValue(_viewModel, viewObj, vmProp, viewProp);
@@ -170,7 +174,7 @@ namespace DashMvvm.Binding
 			if(obj.GetType() == typeof(TextBox))
 			{
 				TextBox txt = obj as TextBox;
-				txt.TextChanged += (sender, e) => ViewChanged(txt,vw => vw.Text);
+				txt.KeyUp += (sender, e) => ViewChanged(txt,vw => vw.Text);
 			}
 			if(obj.GetType() == typeof(DateTimePicker))
 			{
