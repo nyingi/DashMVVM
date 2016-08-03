@@ -26,14 +26,14 @@ namespace DashMvvm.Binding
 	public class DashBinder<TViewModel> where TViewModel : DashViewModel , new()
 	{
 		TViewModel _viewModel;
-		DashViewHandle<TViewModel> _view;
+		DashViewHandle<TViewModel> _viewHandle;
 		Dictionary<object,List<PropertyInfo>> _bindings;
 		internal Validator Validator { get; set; }
 		
-		public DashBinder(TViewModel viewModel,DashViewHandle<TViewModel> view)
+		public DashBinder(TViewModel viewModel,DashViewHandle<TViewModel> viewHandle)
 		{
 			_viewModel = viewModel;
-			_view = view;
+			_viewHandle = viewHandle;
 			_bindings = new Dictionary<object, List<PropertyInfo>>();
 			
 		}
@@ -165,21 +165,32 @@ namespace DashMvvm.Binding
 					}
 				}
 			};
-			AutoBindView(viewObj);
+			AutoBindView<TViewModel>(viewObj,viewProp);
 			return new BindingInformation<TViewObject,TViewModel>(viewObj,this);
 		}
 		
-		private void AutoBindView(object obj)
+		private void AutoBindView<TViewModel>(object obj,PropertyInfo viewProp)
 		{
 			if(obj.GetType() == typeof(TextBox))
 			{
 				TextBox txt = obj as TextBox;
 				txt.KeyUp += (sender, e) => ViewChanged(txt,vw => vw.Text);
 			}
-			if(obj.GetType() == typeof(DateTimePicker))
+			else if(obj.GetType() == typeof(DateTimePicker))
 			{
 				DateTimePicker dtp = obj as DateTimePicker;
 				dtp.ValueChanged += (sender, e) => ViewChanged(dtp,vw => vw.Value);
+			}
+            else
+			{
+			    _viewHandle.ViewPropertyChanged += (sender, args) =>
+			    {
+			        if (args.PropertyName == viewProp.Name)
+			        {
+			            ViewChanged(obj, viewProp);
+			        }
+			    };
+
 			}
 		}
 		
@@ -224,7 +235,7 @@ namespace DashMvvm.Binding
 		
 		private void SetValue(object sourceObj, object destinationObj, PropertyInfo source, PropertyInfo destination)
 		{
-			Control viewControl = (Control)_view.Form;
+			Control viewControl = (Control)_viewHandle.Form;
 			if(viewControl.InvokeRequired)
 			{
 				viewControl.Invoke
@@ -250,16 +261,22 @@ namespace DashMvvm.Binding
 				var genericMethod = theMethod.MakeGenericMethod(destination.PropertyType);
 				destination.SetValue(destinationObj, genericMethod.Invoke(this, new[]{ value}));
 			}
-			else
-			{
-				destination.SetValue(destinationObj, value);
-			}
+            else if (destination.PropertyType == typeof (Guid))
+            {
+                Guid guid = Guid.Parse(value);
+                destination.SetValue(destinationObj, guid);
+            }
+            else
+            {
+
+                destination.SetValue(destinationObj, value);
+            }
 		}
 		
 		public DashBinder<TViewModel> ViewChanged<TViewObject,TViewProperty>(TViewObject viewObj,Expression<Func<TViewObject,TViewProperty>> viewProperty)
 		{
 			
-			if(!_bindings.ContainsKey(viewObj))
+			/*if(!_bindings.ContainsKey(viewObj))
 			{
 				return this;
 			}
@@ -271,11 +288,27 @@ namespace DashMvvm.Binding
 			{
 				SetValue(viewObj, _viewModel, viewProp, propInfo);
 			}
-			return this;
+			return this;*/
+		    return ViewChanged(viewObj, GetPropertyInfo(viewObj, viewProperty));
 		}
-		
-		
-		
+
+
+        private DashBinder<TViewModel> ViewChanged(object viewObj,PropertyInfo viewProp )
+        {
+
+            if (!_bindings.ContainsKey(viewObj))
+            {
+                return this;
+            }
+            
+            var props = _bindings[viewObj];
+
+            foreach (PropertyInfo propInfo in props)
+            {
+                SetValue(viewObj, _viewModel, viewProp, propInfo);
+            }
+            return this;
+        }
 		
 		private PropertyInfo GetPropertyInfo<TSource, TProperty>(
 			TSource source,

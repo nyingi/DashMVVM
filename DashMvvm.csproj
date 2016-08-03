@@ -75,6 +75,7 @@
     </Compile>
     <Compile Include="DashViewHandle.cs" />
     <Compile Include="DashViewModel.cs" />
+    <Compile Include="Events\ViewPropertyChangedEventArgs.cs" />
     <Compile Include="Messaging\IMessageBus.cs" />
     <Compile Include="Messaging\MessageEventArgs.cs" />
     <Compile Include="Messaging\Messager.cs" />
