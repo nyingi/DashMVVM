@@ -27,14 +27,14 @@ namespace DashMvvm.Binding
 	{
 		TViewModel _viewModel;
 		DashViewHandle<TViewModel> _viewHandle;
-		Dictionary<object,List<PropertyInfo>> _bindings;
+		Dictionary<object,List<PropertiesMapper>> _bindings;
 		internal Validator Validator { get; set; }
 		
 		public DashBinder(TViewModel viewModel,DashViewHandle<TViewModel> viewHandle)
 		{
 			_viewModel = viewModel;
 			_viewHandle = viewHandle;
-			_bindings = new Dictionary<object, List<PropertyInfo>>();
+            _bindings = new Dictionary<object, List<PropertiesMapper>>();
 			
 		}
 		
@@ -133,9 +133,9 @@ namespace DashMvvm.Binding
 			
 			if(!_bindings.ContainsKey(viewObj))
 			{
-				_bindings.Add(viewObj, new List<PropertyInfo>());
+				_bindings.Add(viewObj, new List<PropertiesMapper>());
 			}
-			_bindings[viewObj].Add(vmProp);
+            _bindings[viewObj].Add(new PropertiesMapper { ViewProperty = viewProp ,ViewModelProperty = vmProp});
 			_viewModel.PropertyChanged += (object sender, System.ComponentModel.PropertyChangedEventArgs e) => 
 			{
 				if(e.PropertyName == vmProp.Name)
@@ -300,8 +300,9 @@ namespace DashMvvm.Binding
             {
                 return this;
             }
-            
-            var props = _bindings[viewObj];
+
+            var props = _bindings[viewObj].Where(a => a.ViewProperty == viewProp)
+                .Select(b => b.ViewModelProperty).ToList();
 
             foreach (PropertyInfo propInfo in props)
             {
