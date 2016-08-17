@@ -94,17 +94,13 @@ namespace FeatherMvvm.Binding.Components
 
 	    private Type InferListTypeFromContent(object viewModel, PropertyInfo viewModelProperty)
 	    {
-	        try
-	        {
-                IEnumerable content = viewModelProperty.GetValue(viewModel) as IEnumerable;
-                var item = content?.GetEnumerator().Current;
-                return item?.GetType();
-            }
-	        catch
+	        IList content = viewModelProperty.GetValue(viewModel) as IList;
+	        if (content?.Count == 0)
 	        {
 	            return null;
 	        }
-            
+	        var item = content?[0];
+            return item?.GetType();
 	    }
 
 	    private Type InferListTypeFromViewModelProperty(PropertyInfo viewModelProperty)
