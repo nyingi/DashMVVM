@@ -4,3 +4,4 @@ Debug
 modules.xml
 workspace.xml
 FeatherMvvm.sln.iml
+*.suo

@@ -57,7 +57,9 @@ namespace FeatherMvvm.Binding.Components
 					ListViewItem lvi = lv.Items.Add(cellValue.ToString());
 					for (int i = 1; i < listedProps.Count; i++)
 					{
-						lvi.SubItems.Add(listedProps[i].GetValue(item).ToString());
+					    var subItem = listedProps[i].GetValue(item) ?? String.Empty;
+
+                        lvi.SubItems.Add(subItem.ToString());
 					}
 					lvi.Tag = item;
 				}
