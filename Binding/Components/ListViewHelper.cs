@@ -91,25 +91,40 @@ namespace FeatherMvvm.Binding.Components
 				.GetProperties().Where(a => a.GetCustomAttribute<ListViewColumnAttribute>() != null && a.CanRead)
 				.ToList();
 		}
+
+	    private Type InferListTypeFromContent(object viewModel, PropertyInfo viewModelProperty)
+	    {
+            IEnumerable content = viewModelProperty.GetValue(viewModel) as IEnumerable;
+	        var item = content?.GetEnumerator().Current;
+	        return item?.GetType();
+	    }
+
+	    private Type InferListTypeFromViewModelProperty(PropertyInfo viewModelProperty)
+	    {
+	        return viewModelProperty.PropertyType.GenericTypeArguments[0];
+	    }
 		
-		public void AddListViewColumns(ListView lv, PropertyInfo vmProp)
+		public void AddListViewColumns(ListView lv,object viewModel, PropertyInfo viewModelProperty)
 		{
 			if(lv.InvokeRequired)
 			{
 				lv.Invoke((MethodInvoker)delegate
 					{
-						AddListViewColumns(lv, vmProp);
+						AddListViewColumns(lv,viewModel, viewModelProperty);
 					});
 				return;
 			}
 			lv.Columns.Clear();
 			lv.View = View.Details;
 			List<float> widthWeights = new List<float>();
-			if(vmProp.PropertyType.GenericTypeArguments.Length == 0)
+			if(viewModelProperty.PropertyType.GenericTypeArguments.Length == 0)
 			{
 				throw new Exception("ListView columns are currently only generated from lists");
 			}
-			Type listType = vmProp.PropertyType.GenericTypeArguments[0];
+
+		    Type listType = InferListTypeFromContent(viewModel, viewModelProperty) ??
+		                    InferListTypeFromViewModelProperty(viewModelProperty);
+
 			var columnSource = Activator.CreateInstance(listType);
 			foreach(PropertyInfo propInfo in columnSource.GetType().GetProperties())
 			{

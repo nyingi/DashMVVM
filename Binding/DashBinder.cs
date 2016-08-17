@@ -148,7 +148,7 @@ namespace DashMvvm.Binding
 						}
 						else if(viewProp.Name == "Columns")
 						{
-							new ListViewHelper().AddListViewColumns(viewObj as ListView, vmProp);
+							new ListViewHelper().AddListViewColumns(viewObj as ListView,_viewModel, vmProp);
 						}
 					}
 					else if(viewObj.GetType() == typeof(ComboBox))
