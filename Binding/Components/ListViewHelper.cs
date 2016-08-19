@@ -48,11 +48,18 @@ namespace FeatherMvvm.Binding.Components
 			{
 				foreach (var item in list)
 				{
-					
-					ListViewItem lvi = lv.Items.Add(listedProps[0].GetValue(item).ToString());
+				    var cellValue = listedProps[0].GetValue(item);
+				    if (cellValue == null)
+				    {
+				        cellValue = "";
+				    }
+
+					ListViewItem lvi = lv.Items.Add(cellValue.ToString());
 					for (int i = 1; i < listedProps.Count; i++)
 					{
-						lvi.SubItems.Add(listedProps[1].GetValue(item).ToString());
+					    var subItem = listedProps[i].GetValue(item) ?? String.Empty;
+
+                        lvi.SubItems.Add(subItem.ToString());
 					}
 					lvi.Tag = item;
 				}
@@ -84,25 +91,44 @@ namespace FeatherMvvm.Binding.Components
 				.GetProperties().Where(a => a.GetCustomAttribute<ListViewColumnAttribute>() != null && a.CanRead)
 				.ToList();
 		}
+
+	    private Type InferListTypeFromContent(object viewModel, PropertyInfo viewModelProperty)
+	    {
+	        IList content = viewModelProperty.GetValue(viewModel) as IList;
+	        if (content?.Count == 0)
+	        {
+	            return null;
+	        }
+	        var item = content?[0];
+            return item?.GetType();
+	    }
+
+	    private Type InferListTypeFromViewModelProperty(PropertyInfo viewModelProperty)
+	    {
+	        return viewModelProperty.PropertyType.GenericTypeArguments[0];
+	    }
 		
-		public void AddListViewColumns(ListView lv, PropertyInfo vmProp)
+		public void AddListViewColumns(ListView lv,object viewModel, PropertyInfo viewModelProperty)
 		{
 			if(lv.InvokeRequired)
 			{
 				lv.Invoke((MethodInvoker)delegate
 					{
-						AddListViewColumns(lv, vmProp);
+						AddListViewColumns(lv,viewModel, viewModelProperty);
 					});
 				return;
 			}
 			lv.Columns.Clear();
 			lv.View = View.Details;
 			List<float> widthWeights = new List<float>();
-			if(vmProp.PropertyType.GenericTypeArguments.Length == 0)
+			if(viewModelProperty.PropertyType.GenericTypeArguments.Length == 0)
 			{
 				throw new Exception("ListView columns are currently only generated from lists");
 			}
-			Type listType = vmProp.PropertyType.GenericTypeArguments[0];
+
+		    Type listType = InferListTypeFromContent(viewModel, viewModelProperty) ??
+		                    InferListTypeFromViewModelProperty(viewModelProperty);
+
 			var columnSource = Activator.CreateInstance(listType);
 			foreach(PropertyInfo propInfo in columnSource.GetType().GetProperties())
 			{

@@ -7,12 +7,15 @@
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 using System;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using DashMvvm;
 using DashMvvm.Binding;
 using DashMvvm.Messaging;
 using DashMvvm.Validation;
+using FeatherMvvm.Events;
 
 namespace FeatherMvvm
 {
@@ -21,7 +24,8 @@ namespace FeatherMvvm
 	/// </summary>
 	public class DashViewHandle<TViewModel> : IDisposable where TViewModel : DashViewModel , new()
 	{
-		
+
+	    public event EventHandler<ViewPropertyChangedEventArgs> ViewPropertyChanged; 
 
 		private Form _form;
 		public Form Form
@@ -130,5 +134,45 @@ namespace FeatherMvvm
 				return Binder.Validator.DataIsValid;
 			}
 		}
+
+        private PropertyInfo GetPropertyInfo<TSource, TProperty>(
+			TSource source,
+			Expression<Func<TSource, TProperty>> propertyLambda)
+		{
+			Type type = typeof(TSource);
+
+			MemberExpression member = propertyLambda.Body as MemberExpression;
+			if (member == null)
+				throw new ArgumentException(string.Format(
+						"Expression '{0}' refers to a method, not a property.",
+						propertyLambda.ToString()));
+
+			PropertyInfo propInfo = member.Member as PropertyInfo;
+			if (propInfo == null)
+				throw new ArgumentException(string.Format(
+						"Expression '{0}' refers to a field, not a property.",
+						propertyLambda.ToString()));
+
+			if (type != propInfo.ReflectedType &&
+			     !type.IsSubclassOf(propInfo.ReflectedType))
+				throw new ArgumentException(string.Format(
+						"Expresion '{0}' refers to a property that is not from type {1}.",
+						propertyLambda.ToString(),
+						type));
+
+			return propInfo;
+		}
+
+	    public void OnViewPropertyChanged<TViewObject, TViewProperty>(TViewObject view,
+	        Expression<Func<TViewObject, TViewProperty>> viewPropertyExpression)
+	    {
+            PropertyInfo viewProperty = GetPropertyInfo(view, viewPropertyExpression);
+            OnViewPropertyChanged(new ViewPropertyChangedEventArgs(viewProperty.Name));
+	    }
+	    private void OnViewPropertyChanged(ViewPropertyChangedEventArgs e)
+	    {
+	        var handler = ViewPropertyChanged;
+	        if (handler != null) handler(this, e);
+	    }
 	}
 }
