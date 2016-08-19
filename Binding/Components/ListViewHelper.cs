@@ -43,7 +43,7 @@ namespace FeatherMvvm.Binding.Components
 			{
 				return;
 			}
-			var listedProps = GetColumnHeaderProperties(viewModelProperty);
+			var listedProps = GetColumnHeaderProperties(viewModel, viewModelProperty);
 			if (listedProps != null && listedProps.Count > 0)
 			{
 				foreach (var item in list)
@@ -75,18 +75,21 @@ namespace FeatherMvvm.Binding.Components
 			}
 		}
 		
-		private List<PropertyInfo> GetColumnHeaderProperties(PropertyInfo vmProp)
+		private List<PropertyInfo> GetColumnHeaderProperties(object viewModel, PropertyInfo viewModelProperty)
 		{
-			if(vmProp.PropertyType.GenericTypeArguments.Length == 0)
+			if(viewModelProperty.PropertyType.GenericTypeArguments.Length == 0)
 			{
 				throw new Exception("Only lists are currently supported for supplying ListView columns");
 			}
-		    var type = vmProp.PropertyType.GenericTypeArguments[0];
+		    var type = viewModelProperty.PropertyType.GenericTypeArguments[0];
 		    if (type.IsInterface)
 		    {
 		        return null;
 		    }
-			var columnSource = Activator.CreateInstance(type);
+            Type listType = InferListTypeFromContent(viewModel, viewModelProperty) ??
+                            InferListTypeFromViewModelProperty(viewModelProperty);
+
+            var columnSource = Activator.CreateInstance(listType);
 			return columnSource.GetType()
 				.GetProperties().Where(a => a.GetCustomAttribute<ListViewColumnAttribute>() != null && a.CanRead)
 				.ToList();
