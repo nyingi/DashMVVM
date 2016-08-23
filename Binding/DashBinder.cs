@@ -269,7 +269,7 @@ namespace DashMvvm.Binding
             else
             {
 
-                destination.SetValue(destinationObj, value);
+                destination.SetValue(destinationObj, intermediaryValue);
             }
 		}
 		
