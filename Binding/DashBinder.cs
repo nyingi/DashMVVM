@@ -29,6 +29,7 @@ namespace DashMvvm.Binding
 		DashViewHandle<TViewModel> _viewHandle;
 		Dictionary<object,List<PropertiesMapper>> _bindings;
 		internal Validator Validator { get; set; }
+	    public event EventHandler BindingCompleted;
 		
 		public DashBinder(TViewModel viewModel,DashViewHandle<TViewModel> viewHandle)
 		{
@@ -41,6 +42,7 @@ namespace DashMvvm.Binding
 		public void Apply()
 		{
 			_viewModel.Apply();
+            BindingCompleted?.Invoke(this,EventArgs.Empty);
 		}
 
 		
