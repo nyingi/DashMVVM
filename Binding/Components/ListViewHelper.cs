@@ -33,7 +33,7 @@ namespace FeatherMvvm.Binding.Components
                 if(property.GetCustomAttribute<ListViewGroupingColumn>() != null)
                 {
                     var result = property.GetValue(item);
-                    if(result != null)
+                    if(result == null)
                     {
                         return string.Empty;
                     }
