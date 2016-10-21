@@ -13,6 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using FeatherMvvm.Attributes;
+using DashMvvm.Attributes;
 
 namespace FeatherMvvm.Binding.Components
 {
@@ -25,6 +26,22 @@ namespace FeatherMvvm.Binding.Components
 		{
 		}
 		
+        private string GetGroupingColumnName(object item)
+        {
+            foreach (var property in item.GetType().GetProperties())
+            {
+                if(property.GetCustomAttribute<ListViewGroupingColumn>() != null)
+                {
+                    var result = property.GetValue(item);
+                    if(result != null)
+                    {
+                        return string.Empty;
+                    }
+                    return result.ToString();
+                }
+            }
+            return string.Empty;
+        }
 		public void PopulateList(ListView lv,object viewModel,PropertyInfo viewModelProperty)
 		{
 			if(lv.InvokeRequired)
@@ -43,11 +60,19 @@ namespace FeatherMvvm.Binding.Components
 			{
 				return;
 			}
+
 			var listedProps = GetColumnHeaderProperties(viewModel, viewModelProperty);
 			if (listedProps != null && listedProps.Count > 0)
 			{
+                bool gottenGrouping = false;
+                string groupingColumn = string.Empty;
 				foreach (var item in list)
 				{
+                    if(!gottenGrouping)
+                    {
+                        groupingColumn = GetGroupingColumnName(item);
+                        gottenGrouping = true;
+                    }
 				    var cellValue = listedProps[0].GetValue(item);
 				    if (cellValue == null)
 				    {
@@ -62,6 +87,7 @@ namespace FeatherMvvm.Binding.Components
                         lvi.SubItems.Add(subItem.ToString());
 					}
 					lvi.Tag = item;
+                    AddToGroup(lv, lvi, groupingColumn);
 				}
 			}
 			else
@@ -71,10 +97,51 @@ namespace FeatherMvvm.Binding.Components
 					
 					ListViewItem lvi = lv.Items.Add(item.ToString());
 					lvi.Tag = item;
+
 				}
 			}
 		}
 		
+
+        private void AddToGroup(ListView listView, ListViewItem lvi,string groupingColumn)
+        {
+            
+            if(string.IsNullOrEmpty(groupingColumn))
+            {
+                return;
+            }
+
+
+            var group = lvi.Tag.GetType().GetProperty(groupingColumn).GetValue(lvi.Tag);
+            if(group == null)
+            {
+                return;
+            }
+            string groupName = group.ToString();
+            if(string.IsNullOrEmpty(groupName))
+            {
+                return;
+            }
+            var foundIt = false;
+            var headerIndex = 0;
+            for (int i = 0; i < listView.Groups.Count; i++)
+            {
+                if(listView.Groups[i].Header == groupName)
+                {
+                    foundIt = true;
+                    headerIndex = i;
+                    break;
+                }
+            }
+            if(!foundIt)
+            {
+                listView.Groups.Add(new ListViewGroup(groupName,HorizontalAlignment.Left));
+                headerIndex = listView.Groups.Count - 1;
+            }
+            lvi.Group = listView.Groups[headerIndex];
+
+        }
+
 		private List<PropertyInfo> GetColumnHeaderProperties(object viewModel, PropertyInfo viewModelProperty)
 		{
 			if(viewModelProperty.PropertyType.GenericTypeArguments.Length == 0)

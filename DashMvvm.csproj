@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\ListViewColumnAttribute.cs" />
+    <Compile Include="Attributes\ListViewGroupingColumn.cs" />
     <Compile Include="Attributes\SelectedListItemPropertyNameAttribute.cs" />
     <Compile Include="Binding\BindingInformation.cs" />
     <Compile Include="Binding\Components\CheckboxHelper.cs" />
