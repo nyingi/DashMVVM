@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using FeatherMvvm.Attributes;
 using DashMvvm.Attributes;
+using DashMvvm.Forms;
 
 namespace FeatherMvvm.Binding.Components
 {
@@ -42,8 +43,66 @@ namespace FeatherMvvm.Binding.Components
             }
             return string.Empty;
         }
+
+        
+
+        private bool IsInPreviousList(object item,List<object> previousList,PropertyInfo identifierProperty)
+        {
+            if(item == null)
+            {
+                return true;
+            }
+            if(previousList == null || identifierProperty == null)
+            {
+                return false;
+            }
+            var identifierValue = identifierProperty.GetValue(item);
+            if(identifierProperty == null)
+            {
+                return false;
+            }
+            
+            foreach (var previousId in previousList)
+            {
+                if(previousId.Equals(identifierValue))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        private PropertyInfo GetIdentifierProperty(object item)
+        {
+            return item.GetType()
+                .GetProperties()
+                .SingleOrDefault
+                (
+                    a => a.GetCustomAttribute<ListViewItemIdentifier>() != null
+                );
+        }
+
+        private void ShowNewestIfUserRequested(ListView lv,int latestIndex)
+        {
+            var dashListView = lv as DashListView;
+            if (dashListView == null || latestIndex < 0 || latestIndex >= lv.Items.Count)
+            {
+                return;
+            }
+            if(!dashListView.ScrollToNewest)
+            {
+                return;
+            }
+            dashListView.EnsureVisible(latestIndex);
+        }
+
 		public void PopulateList(ListView lv,object viewModel,PropertyInfo viewModelProperty)
 		{
+            if(viewModel == null)
+            {
+                return;
+            }
 			if(lv.InvokeRequired)
 			{
 				lv.Invoke((MethodInvoker)delegate
@@ -52,54 +111,88 @@ namespace FeatherMvvm.Binding.Components
 					});
 				return;
 			}
-			
-			IEnumerable list = viewModelProperty.GetValue(viewModel) as IEnumerable;
-		
-			lv.Items.Clear();
-			if(list == null)
-			{
-				return;
-			}
 
-			var listedProps = GetColumnHeaderProperties(viewModel, viewModelProperty);
-			if (listedProps != null && listedProps.Count > 0)
-			{
-                bool gottenGrouping = false;
-                string groupingColumn = string.Empty;
-				foreach (var item in list)
-				{
-                    if(!gottenGrouping)
+            try
+            {
+                lv.BeginUpdate();
+                PropertyInfo identifierProperty = null;
+                var previousList = (lv.Tag as IEnumerable)?.Cast<object>()?.ToList();
+                IEnumerable list = viewModelProperty.GetValue(viewModel) as IEnumerable;
+
+                if (previousList?.Count >= list.Cast<object>()?.Count())
+                {
+                    previousList = null; // Looks like list is being filtered. Invalidate cache.
+                }
+
+                if (previousList == null)
+                {
+                    lv.Items.Clear();
+                }
+
+                if (list == null)
+                {
+                    return;
+                }
+
+                
+
+                var listedProps = GetColumnHeaderProperties(viewModel, viewModelProperty);
+                if (listedProps != null && listedProps.Count > 0)
+                {
+                    bool initializedThings = false;
+                    string groupingColumn = string.Empty;
+                    foreach (var item in list)
                     {
-                        groupingColumn = GetGroupingColumnName(item);
-                        gottenGrouping = true;
+                        if (!initializedThings)
+                        {
+                            groupingColumn = GetGroupingColumnName(item);
+                            identifierProperty = GetIdentifierProperty(item);
+                            initializedThings = true;
+                        }
+                        if (IsInPreviousList(item, previousList, identifierProperty))
+                        {
+                            continue;
+                        }
+                        var cellValue = listedProps[0].GetValue(item);
+                        if (cellValue == null)
+                        {
+                            cellValue = "";
+                        }
+
+                        ListViewItem lvi = lv.Items.Add(cellValue.ToString());
+                        for (int i = 1; i < listedProps.Count; i++)
+                        {
+                            var subItem = listedProps[i].GetValue(item) ?? String.Empty;
+
+                            lvi.SubItems.Add(subItem.ToString());
+                        }
+                        lvi.Tag = item;
+                        AddToGroup(lv, lvi, groupingColumn);
+                        ShowNewestIfUserRequested(lv, lvi.Index);
                     }
-				    var cellValue = listedProps[0].GetValue(item);
-				    if (cellValue == null)
-				    {
-				        cellValue = "";
-				    }
+                    if (identifierProperty != null)
+                    {
+                        lv.Tag = list.OfType<object>()
+                            .Select(a => identifierProperty.GetValue(a)).ToList();
+                    }
+                }
+                else
+                {
+                    foreach (var item in list)
+                    {
 
-					ListViewItem lvi = lv.Items.Add(cellValue.ToString());
-					for (int i = 1; i < listedProps.Count; i++)
-					{
-					    var subItem = listedProps[i].GetValue(item) ?? String.Empty;
+                        ListViewItem lvi = lv.Items.Add(item.ToString());
+                        lvi.Tag = item;
 
-                        lvi.SubItems.Add(subItem.ToString());
-					}
-					lvi.Tag = item;
-                    AddToGroup(lv, lvi, groupingColumn);
-				}
-			}
-			else
-			{
-				foreach (var item in list)
-				{
-					
-					ListViewItem lvi = lv.Items.Add(item.ToString());
-					lvi.Tag = item;
+                    }
+                }
+            }
+            finally
+            {
+                lv.EndUpdate();
+            }
 
-				}
-			}
+            
 		}
 		
 
@@ -178,6 +271,27 @@ namespace FeatherMvvm.Binding.Components
 	        return viewModelProperty.PropertyType.GenericTypeArguments[0];
 	    }
 		
+
+        private bool HasCorrectColumns(ListView lv, Type listType)
+        {
+            var listView = lv as DashListView;
+            if(listView == null)
+            {
+                return false;
+            }
+            return listView.ColumnSourceCache == listType;
+        }
+
+        private void CacheColumnSource(ListView lv, Type listType)
+        {
+            var listView = lv as DashListView;
+            if (listView == null)
+            {
+                return;
+            }
+            listView.ColumnSourceCache = listType;
+        }
+
 		public void AddListViewColumns(ListView lv,object viewModel, PropertyInfo viewModelProperty)
 		{
 			if(lv.InvokeRequired)
@@ -188,18 +302,30 @@ namespace FeatherMvvm.Binding.Components
 					});
 				return;
 			}
-			lv.Columns.Clear();
-			lv.View = View.Details;
-			List<float> widthWeights = new List<float>();
+
+
+            
 			if(viewModelProperty.PropertyType.GenericTypeArguments.Length == 0)
 			{
 				throw new Exception("ListView columns are currently only generated from lists");
 			}
 
-		    Type listType = InferListTypeFromContent(viewModel, viewModelProperty) ??
+		    var listType = InferListTypeFromContent(viewModel, viewModelProperty) ??
 		                    InferListTypeFromViewModelProperty(viewModelProperty);
 
-			var columnSource = Activator.CreateInstance(listType);
+            if (HasCorrectColumns(lv,listType))
+            {
+                return;
+            }
+
+            CacheColumnSource(lv, listType);
+
+            lv.Columns.Clear();
+            lv.View = View.Details;
+            var widthWeights = new List<float>();
+
+            var columnSource = Activator.CreateInstance(listType);
+            
 			foreach(PropertyInfo propInfo in columnSource.GetType().GetProperties())
 			{
 				if(propInfo.CanRead == false)
@@ -207,6 +333,7 @@ namespace FeatherMvvm.Binding.Components
 					continue;
 				}
 				ListViewColumnAttribute colAttrib = propInfo.GetCustomAttribute<ListViewColumnAttribute>(false);
+
 				if(colAttrib != null)
 				{
 					lv.Columns.Add(colAttrib.Title);					

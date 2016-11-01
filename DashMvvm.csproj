@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="Attributes\ListViewColumnAttribute.cs" />
     <Compile Include="Attributes\ListViewGroupingColumn.cs" />
+    <Compile Include="Attributes\ListViewItemIdentifier.cs" />
     <Compile Include="Attributes\SelectedListItemPropertyNameAttribute.cs" />
     <Compile Include="Binding\BindingInformation.cs" />
     <Compile Include="Binding\Components\CheckboxHelper.cs" />
@@ -78,6 +79,9 @@
     <Compile Include="DashViewHandle.cs" />
     <Compile Include="DashViewModel.cs" />
     <Compile Include="Events\ViewPropertyChangedEventArgs.cs" />
+    <Compile Include="Forms\DashListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Ioc\IocRegistration.cs" />
     <Compile Include="Ioc\DashResolver.cs" />
     <Compile Include="Messaging\IMessageBus.cs" />

@@ -17,6 +17,7 @@ using DashMvvm.Validation;
 using FeatherMvvm;
 using FeatherMvvm.Attributes;
 using FeatherMvvm.Binding.Components;
+using DashMvvm.Forms;
 
 namespace DashMvvm.Binding
 {
@@ -142,7 +143,7 @@ namespace DashMvvm.Binding
 			{
 				if(e.PropertyName == vmProp.Name)
 				{
-					if(viewObj.GetType() == typeof(ListView))
+					if(viewObj.GetType() == typeof(ListView) || viewObj.GetType() == typeof(DashListView))
 					{
 						if(viewProp.Name == "Items")
 						{
@@ -240,15 +241,22 @@ namespace DashMvvm.Binding
 			Control viewControl = (Control)_viewHandle.Form;
 			if(viewControl.InvokeRequired)
 			{
-				viewControl.Invoke
-					(
-						(MethodInvoker)
-						delegate
-						{
-							SetValue(sourceObj,destinationObj,source,destination);
-						}
-				);
-				return;
+                try
+                {
+                    viewControl.Invoke
+                    (
+                        (MethodInvoker)
+                        delegate
+                        {
+                            SetValue(sourceObj, destinationObj, source, destination);
+                        }
+                    );
+                    return;
+                }
+                catch (ObjectDisposedException)
+                {
+                    return;
+                }
 			}
 			object intermediaryValue = source.GetValue(sourceObj);
 			if(!Validator.Validate(sourceObj,intermediaryValue))
