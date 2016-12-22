@@ -69,9 +69,11 @@
     <Compile Include="Attributes\ListViewItemIdentifier.cs" />
     <Compile Include="Attributes\SelectedListItemPropertyNameAttribute.cs" />
     <Compile Include="Binding\BindingInformation.cs" />
+    <Compile Include="Binding\BindingStrategies.cs" />
     <Compile Include="Binding\Components\CheckboxHelper.cs" />
     <Compile Include="Binding\Components\ListViewHelper.cs" />
     <Compile Include="Binding\DashBinder.cs" />
+    <Compile Include="Binding\IBindingStrategy.cs" />
     <Compile Include="Binding\PropertiesMapper.cs" />
     <Compile Include="DashView.cs">
       <SubType>Form</SubType>

@@ -8,7 +8,7 @@
  */
 using System;
 
-namespace FeatherMvvm.Attributes
+namespace DashMvvm.Attributes
 {
 	/// <summary>
 	/// Description of SelectedListItemPropertyNameAttribute.

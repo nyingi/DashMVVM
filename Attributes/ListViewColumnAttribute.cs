@@ -9,20 +9,20 @@
 using System;
 using System.Windows.Forms;
 
-namespace FeatherMvvm.Attributes
+namespace DashMvvm.Attributes
 {
-	/// <summary>
-	/// Description of ListViewColumnAttribute.
-	/// </summary>
-	public class ListViewColumnAttribute : Attribute
-	{
-		public string Title { get; set; }
-		public float WidthWeight { get; set; }
-		
-		public ListViewColumnAttribute(string title,int widthWeight )
-		{
-			Title = title;
-			WidthWeight = widthWeight;
-		}
-	}
+    /// <summary>
+    /// Description of ListViewColumnAttribute.
+    /// </summary>
+    public class ListViewColumnAttribute : Attribute
+    {
+        public string Title { get; set; }
+        public float WidthWeight { get; set; }
+
+        public ListViewColumnAttribute(string title, int widthWeight)
+        {
+            Title = title;
+            WidthWeight = widthWeight;
+        }
+    }
 }

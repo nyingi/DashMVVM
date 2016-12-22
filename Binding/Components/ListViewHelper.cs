@@ -12,21 +12,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
-using FeatherMvvm.Attributes;
+using DashMvvm.Attributes;
 using DashMvvm.Attributes;
 using DashMvvm.Forms;
 
-namespace FeatherMvvm.Binding.Components
+namespace DashMvvm.Binding.Components
 {
-	/// <summary>
-	/// Description of ListViewHelper.
-	/// </summary>
-	internal class ListViewHelper
-	{
-		public ListViewHelper()
-		{
-		}
-		
+    /// <summary>
+    /// Description of ListViewHelper.
+    /// </summary>
+    internal class ListViewHelper
+    {
+        public ListViewHelper()
+        {
+        }
+        
         private string GetGroupingColumnName(object item)
         {
             foreach (var property in item.GetType().GetProperties())
@@ -97,20 +97,20 @@ namespace FeatherMvvm.Binding.Components
             dashListView.EnsureVisible(latestIndex);
         }
 
-		public void PopulateList(ListView lv,object viewModel,PropertyInfo viewModelProperty)
-		{
+        public void PopulateList(ListView lv,object viewModel,PropertyInfo viewModelProperty)
+        {
             if(viewModel == null)
             {
                 return;
             }
-			if(lv.InvokeRequired)
-			{
-				lv.Invoke((MethodInvoker)delegate
-					{
-						PopulateList(lv, viewModel, viewModelProperty);
-					});
-				return;
-			}
+            if(lv.InvokeRequired)
+            {
+                lv.Invoke((MethodInvoker)delegate
+                    {
+                        PopulateList(lv, viewModel, viewModelProperty);
+                    });
+                return;
+            }
 
             try
             {
@@ -118,10 +118,14 @@ namespace FeatherMvvm.Binding.Components
                 PropertyInfo identifierProperty = null;
                 var previousList = (lv.Tag as IEnumerable)?.Cast<object>()?.ToList();
                 IEnumerable list = viewModelProperty.GetValue(viewModel) as IEnumerable;
-
-                if (previousList?.Count >= list.Cast<object>()?.Count())
+                var currentList = list == null ? null : list.Cast<object>();
+                
+                if(currentList != null)
                 {
-                    previousList = null; // Looks like list is being filtered. Invalidate cache.
+                    if (previousList?.Count >= currentList.Count())
+                    {
+                        previousList = null; // Looks like list is being filtered. Invalidate cache.
+                    }
                 }
 
                 if (previousList == null)
@@ -193,8 +197,8 @@ namespace FeatherMvvm.Binding.Components
             }
 
             
-		}
-		
+        }
+        
 
         private void AddToGroup(ListView listView, ListViewItem lvi,string groupingColumn)
         {
@@ -235,42 +239,42 @@ namespace FeatherMvvm.Binding.Components
 
         }
 
-		private List<PropertyInfo> GetColumnHeaderProperties(object viewModel, PropertyInfo viewModelProperty)
-		{
-			if(viewModelProperty.PropertyType.GenericTypeArguments.Length == 0)
-			{
-				throw new Exception("Only lists are currently supported for supplying ListView columns");
-			}
-		    var type = viewModelProperty.PropertyType.GenericTypeArguments[0];
-		    if (type.IsInterface)
-		    {
-		        return null;
-		    }
+        private List<PropertyInfo> GetColumnHeaderProperties(object viewModel, PropertyInfo viewModelProperty)
+        {
+            if(viewModelProperty.PropertyType.GenericTypeArguments.Length == 0)
+            {
+                throw new Exception("Only lists are currently supported for supplying ListView columns");
+            }
+            var type = viewModelProperty.PropertyType.GenericTypeArguments[0];
+            if (type.IsInterface)
+            {
+                return null;
+            }
             Type listType = InferListTypeFromContent(viewModel, viewModelProperty) ??
                             InferListTypeFromViewModelProperty(viewModelProperty);
 
             var columnSource = Activator.CreateInstance(listType);
-			return columnSource.GetType()
-				.GetProperties().Where(a => a.GetCustomAttribute<ListViewColumnAttribute>() != null && a.CanRead)
-				.ToList();
-		}
+            return columnSource.GetType()
+                .GetProperties().Where(a => a.GetCustomAttribute<ListViewColumnAttribute>() != null && a.CanRead)
+                .ToList();
+        }
 
-	    private Type InferListTypeFromContent(object viewModel, PropertyInfo viewModelProperty)
-	    {
-	        IList content = viewModelProperty.GetValue(viewModel) as IList;
-	        if (content?.Count == 0)
-	        {
-	            return null;
-	        }
-	        var item = content?[0];
+        private Type InferListTypeFromContent(object viewModel, PropertyInfo viewModelProperty)
+        {
+            IList content = viewModelProperty.GetValue(viewModel) as IList;
+            if (content?.Count == 0)
+            {
+                return null;
+            }
+            var item = content?[0];
             return item?.GetType();
-	    }
+        }
 
-	    private Type InferListTypeFromViewModelProperty(PropertyInfo viewModelProperty)
-	    {
-	        return viewModelProperty.PropertyType.GenericTypeArguments[0];
-	    }
-		
+        private Type InferListTypeFromViewModelProperty(PropertyInfo viewModelProperty)
+        {
+            return viewModelProperty.PropertyType.GenericTypeArguments[0];
+        }
+        
 
         private bool HasCorrectColumns(ListView lv, Type listType)
         {
@@ -292,26 +296,26 @@ namespace FeatherMvvm.Binding.Components
             listView.ColumnSourceCache = listType;
         }
 
-		public void AddListViewColumns(ListView lv,object viewModel, PropertyInfo viewModelProperty)
-		{
-			if(lv.InvokeRequired)
-			{
-				lv.Invoke((MethodInvoker)delegate
-					{
-						AddListViewColumns(lv,viewModel, viewModelProperty);
-					});
-				return;
-			}
+        public void AddListViewColumns(ListView lv,object viewModel, PropertyInfo viewModelProperty)
+        {
+            if(lv.InvokeRequired)
+            {
+                lv.Invoke((MethodInvoker)delegate
+                    {
+                        AddListViewColumns(lv,viewModel, viewModelProperty);
+                    });
+                return;
+            }
 
 
             
-			if(viewModelProperty.PropertyType.GenericTypeArguments.Length == 0)
-			{
-				throw new Exception("ListView columns are currently only generated from lists");
-			}
+            if(viewModelProperty.PropertyType.GenericTypeArguments.Length == 0)
+            {
+                throw new Exception("ListView columns are currently only generated from lists");
+            }
 
-		    var listType = InferListTypeFromContent(viewModel, viewModelProperty) ??
-		                    InferListTypeFromViewModelProperty(viewModelProperty);
+            var listType = InferListTypeFromContent(viewModel, viewModelProperty) ??
+                            InferListTypeFromViewModelProperty(viewModelProperty);
 
             if (HasCorrectColumns(lv,listType))
             {
@@ -326,34 +330,38 @@ namespace FeatherMvvm.Binding.Components
 
             var columnSource = Activator.CreateInstance(listType);
             
-			foreach(PropertyInfo propInfo in columnSource.GetType().GetProperties())
-			{
-				if(propInfo.CanRead == false)
-				{
-					continue;
-				}
-				ListViewColumnAttribute colAttrib = propInfo.GetCustomAttribute<ListViewColumnAttribute>(false);
+            foreach(PropertyInfo propInfo in columnSource.GetType().GetProperties())
+            {
+                if(propInfo.CanRead == false)
+                {
+                    continue;
+                }
+                ListViewColumnAttribute colAttrib = propInfo.GetCustomAttribute<ListViewColumnAttribute>(false);
 
-				if(colAttrib != null)
-				{
-					lv.Columns.Add(colAttrib.Title);					
-					widthWeights.Add(colAttrib.WidthWeight);
-				}
-			}
-			
-			Action sizeColumns = () =>
-			{
-				float totalWeight = widthWeights.Sum();
-				for(int i = 0; i < lv.Columns.Count; i++)
-				{
-					float columnWidthFraction = widthWeights[i] / totalWeight; 
-					var width = lv.Width * columnWidthFraction;
-					lv.Columns[i].Width = (int)Math.Ceiling(width);
-				}
-			};
-			
-			sizeColumns();
-			lv.Resize += (sender, e) => sizeColumns();
-		}
-	}
+                if(colAttrib != null)
+                {
+                    lv.Columns.Add(colAttrib.Title);					
+                    widthWeights.Add(colAttrib.WidthWeight);
+                }
+            }
+            
+            Action sizeColumns = () =>
+            {
+                if(widthWeights == null || widthWeights.Count != lv.Columns.Count)
+                {
+                    return;
+                }
+                float totalWeight = widthWeights.Sum();
+                for(int i = 0; i < lv.Columns.Count; i++)
+                {
+                    float columnWidthFraction = widthWeights[i] / totalWeight; 
+                    var width = lv.Width * columnWidthFraction;
+                    lv.Columns[i].Width = (int)Math.Ceiling(width);
+                }
+            };
+            
+            sizeColumns();
+            lv.Resize += (sender, e) => sizeColumns();
+        }
+    }
 }

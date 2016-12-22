@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FeatherMvvm.Events
+namespace DashMvvm.Events
 {
     public class ViewPropertyChangedEventArgs : EventArgs
     {

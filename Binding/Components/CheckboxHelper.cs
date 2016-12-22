@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using DashMvvm;
 
-namespace FeatherMvvm.Binding.Components
+namespace DashMvvm.Binding.Components
 {
     public class CheckboxHelper
     {
