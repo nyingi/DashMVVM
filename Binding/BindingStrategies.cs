@@ -12,8 +12,13 @@ namespace DashMvvm.Binding
 
         public static void AddBindingStrategy(IBindingStrategy bindingStrategy)
         {
-            Strategies = Strategies.Where(a => a.ViewType != bindingStrategy.ViewType).ToList();
+            RemoveBindingStrategy(bindingStrategy);
             Strategies.Add(bindingStrategy);
+        }
+
+        public static void RemoveBindingStrategy(IBindingStrategy bindingStrategy)
+        {
+            Strategies = Strategies.Where(a => a.ViewType != bindingStrategy.ViewType).ToList();
         }
     }
 }

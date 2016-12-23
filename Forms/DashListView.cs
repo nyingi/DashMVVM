@@ -29,7 +29,7 @@ namespace DashMvvm.Forms
         }
 
         /// <summary>
-        /// This property caches the type of object that supplies column headers. It is set by the library and any value you set in your code is overridden.
+        /// This property caches the type of object that supplies column headers. It is set by the library and any value you set in your code is overwritten.
         /// </summary>
         public Type ColumnSourceCache { get; set; }
 
